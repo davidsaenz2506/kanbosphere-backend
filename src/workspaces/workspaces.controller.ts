@@ -1,0 +1,34 @@
+import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Post, Put } from '@nestjs/common/decorators';
+import { WorkSpaceDTO } from 'src/dto/workspaces.dto';
+import { WorkspacesService } from './workspaces.service';
+
+@Controller('workspaces')
+export class WorkspacesController {
+
+    constructor(private readonly service: WorkspacesService) { }
+
+    @Get()
+    FindAllWorkSpaces() {
+        return this.service.FindAllWorkSpaces()
+    }
+
+    @Get("/:workspaceId")
+    FindOneWorkSpace(@Param("workspaceId") workspaceId: string) {
+        return this.service.FindOne(workspaceId)
+    }
+
+    @Post()
+    AddWorkSpace(@Body() body: WorkSpaceDTO) {
+        return this.service.AddWorkSpace(body)
+    }
+
+    @Post("/:workspaceId")
+    UpdateWorkSpace(@Param("workspaceId") id: string, @Body() body: WorkSpaceDTO) {
+        console.log(id)
+        return this.service.UpdateWorkSpace(id, body)
+    }
+
+
+
+}
