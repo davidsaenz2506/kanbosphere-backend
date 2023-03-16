@@ -25,7 +25,6 @@ export class WorkspacesController {
 
     @Post("/:workspaceId")
     UpdateWorkSpace(@Param("workspaceId") id: string, @Body() body: WorkSpaceDTO) {
-        console.log(id)
         return this.service.UpdateWorkSpace(id, body)
     }
 
