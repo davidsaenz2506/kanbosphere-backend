@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Body, Post, Put } from '@nestjs/common/decorators';
+import { Body, Delete, Post, Put } from '@nestjs/common/decorators';
 import { WorkSpaceDTO } from 'src/dto/workspaces.dto';
 import { WorkspacesService } from './workspaces.service';
 
@@ -26,6 +26,12 @@ export class WorkspacesController {
     @Post("/:workspaceId")
     UpdateWorkSpace(@Param("workspaceId") id: string, @Body() body: WorkSpaceDTO) {
         return this.service.UpdateWorkSpace(id, body)
+    }
+
+    @Post("/delete/:workspaceId")
+    DeleteWorkSpace(@Param("workspaceId") id: string) {
+        console.log(id)
+        return this.service.DeleteWorkSpace(id)
     }
 
 

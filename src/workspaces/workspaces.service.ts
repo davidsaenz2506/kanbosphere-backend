@@ -30,6 +30,11 @@ export class WorkspacesService {
         )
     }
 
+    DeleteWorkSpace(id: string) {
+        console.log(id)
+        return this.workspaceModel.findByIdAndDelete(id)
+    }
+
 
 
 
