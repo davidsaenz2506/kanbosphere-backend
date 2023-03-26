@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { Body, Delete, Post, Put } from '@nestjs/common/decorators';
+import { Body, Delete, Post, Put, UseGuards } from '@nestjs/common/decorators';
 import { WorkSpaceDTO } from 'src/dto/workspaces.dto';
 import { WorkspacesService } from './workspaces.service';
 
