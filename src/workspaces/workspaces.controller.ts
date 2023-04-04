@@ -5,35 +5,34 @@ import { WorkspacesService } from './workspaces.service';
 
 @Controller('workspaces')
 export class WorkspacesController {
+  constructor(private readonly service: WorkspacesService) {}
 
-    constructor(private readonly service: WorkspacesService) { }
+  @Get()
+  FindAllWorkSpaces() {
+    return this.service.FindAllWorkSpaces();
+  }
 
-    @Get()
-    FindAllWorkSpaces() {
-        return this.service.FindAllWorkSpaces()
-    }
+  @Get('/:workspaceId')
+  FindOneWorkSpace(@Param('workspaceId') workspaceId: string) {
+    return this.service.FindOne(workspaceId);
+  }
 
-    @Get("/:workspaceId")
-    FindOneWorkSpace(@Param("workspaceId") workspaceId: string) {
-        return this.service.FindOne(workspaceId)
-    }
+  @Post()
+  AddWorkSpace(@Body() body: WorkSpaceDTO) {
+    return this.service.AddWorkSpace(body);
+  }
 
-    @Post()
-    AddWorkSpace(@Body() body: WorkSpaceDTO) {
-        return this.service.AddWorkSpace(body)
-    }
+  @Post('/:workspaceId')
+  UpdateWorkSpace(
+    @Param('workspaceId') id: string,
+    @Body() body: WorkSpaceDTO,
+  ) {
+    return this.service.UpdateWorkSpace(id, body);
+  }
 
-    @Post("/:workspaceId")
-    UpdateWorkSpace(@Param("workspaceId") id: string, @Body() body: WorkSpaceDTO) {
-        return this.service.UpdateWorkSpace(id, body)
-    }
-
-    @Post("/delete/:workspaceId")
-    DeleteWorkSpace(@Param("workspaceId") id: string) {
-        console.log(id)
-        return this.service.DeleteWorkSpace(id)
-    }
-
-
-
+  @Post('/delete/:workspaceId')
+  DeleteWorkSpace(@Param('workspaceId') id: string) {
+    console.log(id);
+    return this.service.DeleteWorkSpace(id);
+  }
 }

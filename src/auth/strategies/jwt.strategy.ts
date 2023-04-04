@@ -6,26 +6,22 @@ import { IJwtPayload } from '../jwt-payload.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor(private usersService: UsersService) {
+    super({
+      secretOrKey: 'super-secret',
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    });
+  }
 
-    constructor(private usersService: UsersService) {
-        super({
-            secretOrKey: 'super-secret',
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        });
+  async validateUser(payload: IJwtPayload): Promise<IUser> {
+    const { username } = payload;
+
+    const user = this.usersService.FindOneAndProceed(username);
+
+    if (!user) {
+      throw new UnauthorizedException();
     }
 
-    async validateUser(payload: IJwtPayload): Promise<IUser> {
-
-        const { username } = payload;
-
-        const user = this.usersService.FindOneAndProceed(username);
-
-        if (!user) {
-            throw new UnauthorizedException();
-        }
-
-        return user;
-
-    }
-    
+    return user;
+  }
 }
