@@ -9,6 +9,7 @@ export interface IUser {
   email: string;
   userID: string;
   password: string;
+  profilePicture: string;
 }
 
 @Injectable()
