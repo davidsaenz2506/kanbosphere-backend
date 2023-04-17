@@ -5,6 +5,9 @@ import { UserLog, UserLogDocument } from 'src/models/userlog.model';
 
 export interface IUser {
   username: string;
+  fullname: string;
+  email: string;
+  userID: string;
   password: string;
 }
 
@@ -12,7 +15,7 @@ export interface IUser {
 export class UsersService {
   constructor(
     @InjectModel(UserLog.name) private usersLogModel: Model<UserLogDocument>,
-  ) {}
+  ) { }
 
   async FindOneAndProceed(username: string): Promise<IUser | undefined> {
     return this.usersLogModel.findOne({ username });

@@ -9,7 +9,8 @@ interface IToDoData {
     status: string,
     info: string,
     title: string,
-    createdDate: Date
+    createdDate: Date,
+    file: string
 }
 
 @Schema()

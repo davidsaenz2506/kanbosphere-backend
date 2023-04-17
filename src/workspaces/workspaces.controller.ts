@@ -7,9 +7,9 @@ import { WorkspacesService } from './workspaces.service';
 export class WorkspacesController {
   constructor(private readonly service: WorkspacesService) {}
 
-  @Get()
-  FindAllWorkSpaces() {
-    return this.service.FindAllWorkSpaces();
+  @Get('/userWorkspaces/:userId')
+  FindUserWorkSpaces(@Param('userId') userId: string) {
+    return this.service.FindAllWorkSpaces(userId);
   }
 
   @Get('/:workspaceId')
