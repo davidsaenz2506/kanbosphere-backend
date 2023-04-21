@@ -13,6 +13,12 @@ interface IToDoData {
     file: string
 }
 
+interface ISpreadData {
+    userId: string,
+    columns: [],
+    data: []
+}
+
 @Schema()
 export class WorkSpace {
 
@@ -28,8 +34,11 @@ export class WorkSpace {
     @Prop({ required: true })
     type: string;
 
-    @Prop({ required: true })
+    @Prop({ required: false })
     wspData: IToDoData[];
+
+    @Prop({ required: false, type: Object })
+    spreadSheetData: ISpreadData;
 
 }
 

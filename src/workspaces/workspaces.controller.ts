@@ -5,7 +5,7 @@ import { WorkspacesService } from './workspaces.service';
 
 @Controller('workspaces')
 export class WorkspacesController {
-  constructor(private readonly service: WorkspacesService) {}
+  constructor(private readonly service: WorkspacesService) { }
 
   @Get('/userWorkspaces/:userId')
   FindUserWorkSpaces(@Param('userId') userId: string) {
@@ -32,7 +32,6 @@ export class WorkspacesController {
 
   @Post('/delete/:workspaceId')
   DeleteWorkSpace(@Param('workspaceId') id: string) {
-    console.log(id);
     return this.service.DeleteWorkSpace(id);
   }
 }

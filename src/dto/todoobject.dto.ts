@@ -1,4 +1,3 @@
-
 export class ToDoDataDTO {
     userId: string;
     taskId: string;
@@ -7,3 +6,4 @@ export class ToDoDataDTO {
     title: string;
     createdDate: Date
 }
+
