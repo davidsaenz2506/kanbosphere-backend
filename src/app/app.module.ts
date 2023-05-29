@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from 'src/auth/auth.module';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
+import { SpreadSheetModule } from 'src/spreadsheet/spreadsheet.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { WorkspacesModule } from '../workspaces/workspaces.module';
     ),
     WorkspacesModule,
     AuthModule,
+    SpreadSheetModule
   ],
 })
 export class AppModule {}
