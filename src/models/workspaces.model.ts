@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from "mongoose";
+import { IPriority } from "src/dto/todoobject.dto";
 
 export type WorkSpaceDocument = WorkSpace & Document;
 
@@ -7,6 +8,8 @@ interface IToDoData {
     userId: string,
     taskId: string,
     status: string,
+    priority: IPriority,
+    description: string,
     info: string,
     title: string,
     createdDate: Date,
@@ -24,6 +27,9 @@ export class WorkSpace {
 
     @Prop({ required: true })
     name: string;
+
+    @Prop({ required: false })
+    prefix: string;
 
     @Prop({ required: true })
     createdDate: Date;
