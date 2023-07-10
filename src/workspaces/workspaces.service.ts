@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { ToDoDataDTO } from 'src/dto/todoobject.dto';
 import { WorkSpaceDTO } from 'src/dto/workspaces.dto';
 import { WorkSpace, WorkSpaceDocument } from 'src/models/workspaces.model';
 
@@ -13,7 +14,7 @@ export class WorkspacesService {
 
   FindAllWorkSpaces(userId: string) {
     return this.workspaceModel.find({
-        createdById: userId,
+      createdById: userId,
     });
   }
 
@@ -25,7 +26,52 @@ export class WorkspacesService {
     return this.workspaceModel.create(body);
   }
 
-  UpdateWorkSpace(id: string, body: WorkSpaceDTO) {
+  async UpdateDataMatrix(id: string, body: Partial<ToDoDataDTO>, method: string) {
+    switch (method) {
+      case 'add':
+        return this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $push: {
+              wspData: body,
+            },
+          },
+        );
+      case 'delete':
+        return this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $pull: {
+              wspData: {
+                taskId: body.taskId,
+              },
+            },
+          },
+        );
+      case 'update':
+        await this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $pull: {
+              wspData: {
+                taskId: body.taskId,
+              },
+            },
+          },
+        );
+
+        await this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $push: {
+              wspData: body,
+            },
+          },
+        );
+    }
+  }
+
+  UpdateWorkspace(id: string, body: WorkSpaceDTO) {
     return this.workspaceModel.findOneAndUpdate(
       { _id: id },
       { $set: body },
@@ -34,7 +80,6 @@ export class WorkspacesService {
   }
 
   DeleteWorkSpace(id: string) {
-    console.log(id);
     return this.workspaceModel.findByIdAndDelete(id);
   }
 }

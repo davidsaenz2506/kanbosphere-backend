@@ -1,5 +1,5 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Document, ObjectId } from "mongoose";
 import { IPriority } from "src/dto/todoobject.dto";
 
 export type WorkSpaceDocument = WorkSpace & Document;

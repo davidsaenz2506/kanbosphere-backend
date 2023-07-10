@@ -13,7 +13,7 @@ import { SpreadSheetModule } from 'src/spreadsheet/spreadsheet.module';
     ),
     WorkspacesModule,
     AuthModule,
-    SpreadSheetModule
+    SpreadSheetModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
