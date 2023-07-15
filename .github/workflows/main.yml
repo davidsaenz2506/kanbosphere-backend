@@ -14,6 +14,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: npm i --force
+        run: yarn install
 
       # Agrega aquí los pasos adicionales necesarios para tu implementación
