@@ -10,11 +10,6 @@ async function bootstrap() {
   app.enableCors();
   app.use(urlencoded({ extended: true, limit: '50mb' }));
 
-  app.use((req: Request, res: Response, next: Function) => {
-
-    next();
-  });
-
   const port = process.env.PORT;
   const currentServer = await app.listen(port || 5000);
   const io = new Server(currentServer, { cors: { origin: '*' } });
