@@ -32,7 +32,7 @@
     "@typegoose/typegoose": "^11.3.0",
     "bcrypt": "^5.1.0",
     "diagnostics_channel": "^1.1.0",
-    "mongoose": "^14.20.1",
+    "mongoose": "^7.3.4",
     "passport": "^0.6.0",
     "passport-headerapikey": "^1.2.2",
     "passport-jwt": "^4.0.1",
