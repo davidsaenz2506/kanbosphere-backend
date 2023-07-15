@@ -1,8 +1,19 @@
-import { Controller, Get, Inject, Logger, Param } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Inject,
+    Logger,
+    Param,
+    Post,
+    Body,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { type } from 'os';
 import { Server } from 'socket.io';
+import { UserLog, UserLogDocument } from 'src/models/userlog.model';
 import { WorkSpace, WorkSpaceDocument } from 'src/models/workspaces.model';
+import { UsersService } from 'src/users/users.service';
 import { WorkspacesService } from 'src/workspaces/workspaces.service';
 
 @Controller('data-updates')
@@ -11,27 +22,90 @@ export class DataUpdatesController {
 
     constructor(
         private readonly databaseService: WorkspacesService,
+        private readonly usersdatabaseService: UsersService,
         @Inject('SOCKET_SERVER') private readonly server: { instance: Server },
         @InjectModel(WorkSpace.name)
         private workspaceModel: Model<WorkSpaceDocument>,
+        @InjectModel(UserLog.name) private usersSpaceModel: Model<UserLogDocument>,
     ) { }
 
-    @Get('/:userId')
-    async getUpdatedData(@Param('userId') currentUserId: string) {
+    @Post('/getUpdatedWorkspaceData/:userId')
+    async getUpdatedData(
+        @Param('userId') currentUserId: string,
+        @Body() currentRoomToken: { roomToken: string },
+    ) {
         try {
-            const dataBaseChangeStream = this.workspaceModel.watch();
+            const workSpaceChangeStream = this.workspaceModel.watch([], {
+                fullDocument: 'updateLookup',
+            });
 
-            dataBaseChangeStream.on('change', async () => {
-                const updatedData = await this.databaseService.FindAllWorkSpaces(
-                    currentUserId,
-                );
-
-                this.server.instance.emit('currentDataUpdated', updatedData);
+            workSpaceChangeStream.on('change', async (change) => {
+                this.server.instance
+                    .to(currentRoomToken.roomToken)
+                    .emit(
+                        'currentDataUpdated',
+                        await this.databaseService.FindAllWorkSpaces(currentUserId),
+                    );
 
                 return { message: 'Data updated and sent to client' };
             });
 
-            dataBaseChangeStream.on('error', (error) => {
+            workSpaceChangeStream.on('error', (error) => {
+                this.logger.error('Change stream error:', error);
+            });
+        } catch (error) {
+            this.logger.error('Error updating and sending data', error);
+            throw error;
+        }
+    }
+
+    @Post('/getUpdatedUserData/:userId')
+    async getUpdatedUserData(
+        @Param('userId') currentUserId: string,
+        @Body() currentRoomToken: { roomToken: string },
+    ) {
+        try {
+            const usersCollectionStream = this.usersSpaceModel.watch(
+                [
+                    {
+                        $match: { 'fullDocument.userID': currentUserId },
+                    },
+                ],
+                {
+                    fullDocument: 'updateLookup',
+                },
+            );
+
+            usersCollectionStream.on('change', async (change) => {
+                const updatedUserData = await this.usersSpaceModel.findOne({
+                    userID: currentUserId,
+                });
+
+                const friendsData = updatedUserData.friends.map(
+                    (currentItem: any) => currentItem.canonicalId,
+                );
+                const requestData = updatedUserData.requests.map(
+                    (currentItem: any) => currentItem.canonicalId,
+                );
+
+                const dataShake1 = await this.usersdatabaseService.FindLotOfUsers(
+                    friendsData,
+                );
+                const dataShake2 = await this.usersdatabaseService.FindLotOfUsers(
+                    requestData,
+                );
+
+                if (updatedUserData)
+                    this.server.instance
+                        .to(currentRoomToken.roomToken)
+                        .emit('currentUserUpdated', [
+                            updatedUserData,
+                            { friends: dataShake1, requests: dataShake2 },
+                        ]);
+                return { message: 'Data updated and sent to client' };
+            });
+
+            usersCollectionStream.on('error', (error) => {
                 this.logger.error('Change stream error:', error);
             });
         } catch (error) {
