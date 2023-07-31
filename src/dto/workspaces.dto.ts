@@ -1,5 +1,10 @@
 import { ToDoDataDTO } from "./todoobject.dto";
 import { SpreadDataDTO } from "./spread.dto";
+import { ObjectId } from "mongoose";
+
+export interface IWspPreferences {
+    selectedTask: string
+}
 
 export class WorkSpaceDTO {
     name: string;
@@ -9,4 +14,6 @@ export class WorkSpaceDTO {
     type: string;
     wspData?: ToDoDataDTO[];
     spreadSheetData?: SpreadDataDTO[];
+    wspDataPreferences?: IWspPreferences;
+    sharedWith: ObjectId[];
 }

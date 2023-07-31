@@ -22,7 +22,7 @@ export class AuthService {
       (await this.encoderService.checkEncodePassword(password, user.password))
     ) {
       const payload: IJwtPayload = { username: username, active: true };
-      const accessToken = this.jwtService.sign(payload);
+      const accessToken = this.jwtService.sign(payload, { expiresIn: "5h" });
 
       return { accessToken, user };
     }
@@ -42,7 +42,7 @@ export class AuthService {
       active: user['active'],
     };
 
-    const token = await this.jwtService.sign(payload);
+    const token = await this.jwtService.sign(payload, { expiresIn: "5h" });
     return { token };
   }
 }

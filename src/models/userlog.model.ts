@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document, ObjectId } from "mongoose";
+import { IUserInvitations } from "src/dto/userdata.dto";
 
 export type UserLogDocument = UserLog & Document;
 
@@ -34,6 +35,9 @@ export class UserLog {
     
     @Prop({ required: true })
     requests: IFriendRequest[];
+
+    @Prop({ required: true, type: Array })
+    invitations: IUserInvitations[];
 
 }
 

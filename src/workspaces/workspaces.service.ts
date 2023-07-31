@@ -10,7 +10,7 @@ export class WorkspacesService {
   constructor(
     @InjectModel(WorkSpace.name)
     private workspaceModel: Model<WorkSpaceDocument>,
-  ) {}
+  ) { }
 
   FindAllWorkSpaces(userId: string) {
     return this.workspaceModel.find({
@@ -26,7 +26,27 @@ export class WorkspacesService {
     return this.workspaceModel.create(body);
   }
 
-  async UpdateDataMatrix(id: string, body: Partial<ToDoDataDTO>, method: string) {
+  AddUserToWorkspaceGateway(guestId: string, workspaceId: string, step: string) {
+    const userToAdd: string = guestId;
+    const workspaceIdServer: string = workspaceId;
+
+    const updatedWorkspace = this.workspaceModel.findByIdAndUpdate(
+      workspaceIdServer,
+      {
+        $push: {
+          sharedWith: userToAdd,
+        },
+      },
+    );
+
+    return updatedWorkspace;
+  }
+
+  async UpdateDataMatrix(
+    id: string,
+    body: Partial<ToDoDataDTO>,
+    method: string,
+  ) {
     switch (method) {
       case 'add':
         return this.workspaceModel.updateOne(

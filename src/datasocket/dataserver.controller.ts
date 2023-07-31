@@ -1,6 +1,5 @@
 import {
     Controller,
-    Get,
     Inject,
     Logger,
     Param,
@@ -9,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { type } from 'os';
 import { Server } from 'socket.io';
 import { UserLog, UserLogDocument } from 'src/models/userlog.model';
 import { WorkSpace, WorkSpaceDocument } from 'src/models/workspaces.model';
@@ -38,16 +36,19 @@ export class DataUpdatesController {
             const workSpaceChangeStream = this.workspaceModel.watch([], {
                 fullDocument: 'updateLookup',
             });
-
+            
             workSpaceChangeStream.on('change', async (change) => {
-                this.server.instance
-                    .to(currentRoomToken.roomToken)
-                    .emit(
-                        'currentDataUpdated',
-                        await this.databaseService.FindAllWorkSpaces(currentUserId),
-                    );
+                console.log(this.server.instance.sockets.adapter.rooms)
+                if (!change?.updateDescription?.updatedFields?.hasOwnProperty("wspDataPreferences")) {
+                    this.server.instance
+                        .to(currentRoomToken.roomToken)
+                        .emit(
+                            'currentDataUpdated',
+                            await this.databaseService.FindAllWorkSpaces(currentUserId),
+                        );
 
-                return { message: 'Data updated and sent to client' };
+                    return { message: 'Data updated and sent to client' };
+                }
             });
 
             workSpaceChangeStream.on('error', (error) => {

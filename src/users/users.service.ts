@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { Model, ObjectId } from 'mongoose';
-import { UserDataDTO } from 'src/dto/userdata.dto';
+import { IUserInvitations, UserDataDTO } from 'src/dto/userdata.dto';
 import {
   IFriendRequest,
   UserLog,
@@ -12,6 +12,7 @@ import {
 import * as jwt from 'jsonwebtoken';
 import * as sharp from 'sharp';
 import { join } from 'path';
+import { WorkSpace, WorkSpaceDocument } from 'src/models/workspaces.model';
 
 export interface IUser {
   _id: ObjectId;
@@ -29,6 +30,8 @@ export interface IUser {
 export class UsersService {
   constructor(
     @InjectModel(UserLog.name) private usersLogModel: Model<UserLogDocument>,
+    @InjectModel(WorkSpace.name)
+    private workspaceModel: Model<WorkSpaceDocument>,
   ) { }
 
   async FindOneAndProceed(username: string): Promise<IUser | undefined> {
@@ -48,6 +51,69 @@ export class UsersService {
       { $set: body },
       { new: true },
     );
+  }
+
+  async SendJobInvitation(
+    hostInfo: Partial<IUserInvitations>,
+    guestId: string,
+  ): Promise<any> {
+    return this.usersLogModel.findOneAndUpdate(
+      { _id: guestId },
+      {
+        $push: {
+          invitations: {
+            ...hostInfo,
+            requestDate: new Date(),
+          },
+        },
+      },
+    );
+  }
+
+  async HandleJobInvitation(
+    hostInfo: Partial<IUserInvitations>,
+    guestId: string,
+  ): Promise<any> {
+    switch (hostInfo.method) {
+      case 'delete':
+        return this.usersLogModel.findOneAndUpdate(
+          { _id: guestId },
+          {
+            $pull: {
+              invitations: {
+                $and: [
+                  { workspaceToJoinId: hostInfo.workspaceToJoinId },
+                  { hostId: hostInfo.hostId },
+                ],
+              },
+            },
+          },
+        );
+
+      case 'accept':
+        await this.usersLogModel.findOneAndUpdate(
+          { _id: guestId },
+          {
+            $pull: {
+              invitations: {
+                $and: [
+                  { workspaceToJoinId: hostInfo.workspaceToJoinId },
+                  { hostId: hostInfo.hostId },
+                ],
+              },
+            },
+          },
+        );
+
+        return this.workspaceModel.findOneAndUpdate(
+          { _id: hostInfo.workspaceToJoinId },
+          {
+            $push: {
+              sharedWith: guestId
+            }
+          }
+        )
+    }
   }
 
   async FindUserQuery(username: string, request: Request): Promise<any> {
@@ -96,7 +162,7 @@ export class UsersService {
             },
           ],
         },
-        { password: 0, friends: 0, requests: 0 },
+        { password: 0, friends: 0, requests: 0, invitations: 0 },
       )
       .limit(3);
 
@@ -134,7 +200,10 @@ export class UsersService {
           },
         ],
       },
-      { password: 0, friends: 0, requests: 0 },
+      {
+        password: 0, friends: 0, requests: 0, 'invitations.hostId': 0, 'invitations.hostName': 0, 'invitations.workspaceToJoinType': 0,
+        'invitations.workspaceUsersAmount': 0, 'invitations.workspaceToJoin': 0, 'invitations.requestDate': 0,
+      },
     );
 
     for (const currentUser of userDownload) {

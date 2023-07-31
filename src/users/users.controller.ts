@@ -9,8 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { IUser, UsersService } from './users.service';
-import { UserDataDTO } from 'src/dto/userdata.dto';
-import { IFriendRequest } from 'src/models/userlog.model';
+import { IUserInvitations, UserDataDTO } from 'src/dto/userdata.dto';
 import { ObjectId } from 'mongoose';
 
 export interface IContactOperations {
@@ -20,7 +19,7 @@ export interface IContactOperations {
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly service: UsersService) {}
+  constructor(private readonly service: UsersService) { }
 
   @UseGuards(AuthGuard)
   @Post('/update/:userId')
@@ -40,6 +39,26 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
+  @Post('/sendInvitationToJob/:guestId')
+  async SendJobInvitation(
+    @Param('guestId') guestId: string,
+    @Body() body: Partial<IUserInvitations>,
+  ) {
+    await this.service.SendJobInvitation(body, guestId);
+    return { message: "Sended" }
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/handleInvitationToJob/:guestId')
+  async AcceptJobInvitation(
+    @Param('guestId') guestId: string,
+    @Body() body: Partial<IUserInvitations>,
+  ) {
+    await this.service.HandleJobInvitation(body, guestId);
+    return { message: "Updated" }
+  }
+
+  @UseGuards(AuthGuard)
   @Post('/getUsersByArray')
   async GetUsersByArray(@Body() body: ObjectId[]) {
     const userData: IUser[] = await this.service.FindLotOfUsers(body);
@@ -54,13 +73,17 @@ export class UsersController {
   ) {
     switch (body.method) {
       case 'sendreq':
-        return this.service.SendFriendRequest(username, body.canonicalId);
+        this.service.SendFriendRequest(username, body.canonicalId);
+        return
       case 'acceptreq':
-        return this.service.AcceptFriendRequest(username, body.canonicalId);
+        this.service.AcceptFriendRequest(username, body.canonicalId);
+        return
       case 'deletereq':
-        return this.service.DeleteFriendRequest(username, body.canonicalId);
+        this.service.DeleteFriendRequest(username, body.canonicalId);
+        return
       case 'delete':
-        return this.service.DeleteFriend(username, body.canonicalId);
+        this.service.DeleteFriend(username, body.canonicalId);
+        return
       default:
         break;
     }

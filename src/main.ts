@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { urlencoded, json } from 'express';
 import { Server } from 'socket.io';
+import { createServer } from 'http';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,16 +11,29 @@ async function bootstrap() {
   app.enableCors();
   app.use(urlencoded({ extended: true, limit: '50mb' }));
 
-  const port = process.env.PORT;
-  const currentServer = await app.listen(port || 5000);
-  const io = new Server(currentServer, { cors: { origin: '*' } });
- 
+  const nestPort = process.env.PORT || 5000;
+  const socketPort = 9000;
+
+  await app.listen(nestPort);
+  const httpServer = createServer(app.getHttpServer());
+
+  const io = new Server(httpServer, { cors: { origin: '*' } });
+
   io.on('connection', (request) => {
-      request.on('joinToRoom', (dataSet) => {
-         request.join(dataSet)
-      })
-  })
+    request.on('joinToRoom', (dataSet) => {
+      request.join(dataSet);
+    });
+
+    request.on('joinToWorkspaceRoom', (dataSet) => {
+      request.join(dataSet);
+    });
+  });
+
+  httpServer.listen(socketPort, () => {
+    console.log(`Socket.IO server listening on port ${socketPort}`);
+  });
 
   app.get('SOCKET_SERVER').instance = io;
 }
+
 bootstrap();
