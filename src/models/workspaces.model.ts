@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document, ObjectId } from "mongoose";
 import { IFilePath, IPriority } from "src/dto/todoobject.dto";
-import { IWspPreferences } from "src/dto/workspaces.dto";
+import { IAgilePreferences, ISpreadSheetPreferences } from "src/dto/workspaces.dto";
 
 export type WorkSpaceDocument = WorkSpace & Document;
 
@@ -45,7 +45,7 @@ export class WorkSpace {
     wspData: IToDoData[];
 
     @Prop({ required: false, type: Object })
-    wspDataPreferences?: IWspPreferences;
+    wspDataPreferences?: IAgilePreferences | ISpreadSheetPreferences;
 
     @Prop({ required: false, type: Object })
     spreadSheetData: ISpreadData;

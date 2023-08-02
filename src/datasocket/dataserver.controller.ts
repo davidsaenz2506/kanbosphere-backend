@@ -38,7 +38,6 @@ export class DataUpdatesController {
             });
             
             workSpaceChangeStream.on('change', async (change) => {
-                console.log(this.server.instance.sockets.adapter.rooms)
                 if (!change?.updateDescription?.updatedFields?.hasOwnProperty("wspDataPreferences")) {
                     this.server.instance
                         .to(currentRoomToken.roomToken)
