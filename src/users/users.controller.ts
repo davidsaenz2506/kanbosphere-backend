@@ -39,26 +39,6 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
-  @Post('/sendInvitationToJob/:guestId')
-  async SendJobInvitation(
-    @Param('guestId') guestId: string,
-    @Body() body: Partial<IUserInvitations>,
-  ) {
-    await this.service.SendJobInvitation(body, guestId);
-    return { message: "Sended" }
-  }
-
-  @UseGuards(AuthGuard)
-  @Post('/handleInvitationToJob/:guestId')
-  async AcceptJobInvitation(
-    @Param('guestId') guestId: ObjectId,
-    @Body() body: Partial<IUserInvitations>,
-  ) {
-    await this.service.HandleJobInvitation(body, guestId);
-    return { message: "Updated" }
-  }
-
-  @UseGuards(AuthGuard)
   @Post('/getUsersByArray')
   async GetUsersByArray(@Body() body: ObjectId[]) {
     const userData: IUser[] = await this.service.FindLotOfUsers(body);

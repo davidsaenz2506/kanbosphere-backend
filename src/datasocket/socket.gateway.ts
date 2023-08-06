@@ -19,7 +19,7 @@ export interface ITransactionData {
 }
 
 export interface ISocialTransactionData {
-    currentReceiverId: string,
+    currentReceiverId: string | ObjectId,
     currentTransmitterId: string | ObjectId
 }
 
@@ -65,10 +65,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const updatedReceiverData = await this.usersSpaceModel.findOne({ _id: transactionInformation.currentReceiverId });
             const updatedTransmitterData = await this.usersSpaceModel.findOne({ _id: transactionInformation.currentTransmitterId });
-            const allUsers = await this.usersSpaceModel.find()
-
-            console.log(updatedReceiverData, updatedTransmitterData, allUsers)
-            console.log(transactionInformation.currentReceiverId, transactionInformation.currentTransmitterId)
 
             if (updatedReceiverData && updatedTransmitterData) {
                 const friendsReceiverData = updatedReceiverData.friends.map((currentItem: any) => currentItem.canonicalId);
@@ -84,7 +80,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
                 const dataShake2Transmitter = await this.usersService.FindLotOfUsers(requestTransmitterData);
 
 
-                this.server.to(transactionInformation.currentReceiverId).emit('currentUserUpdated', [updatedReceiverData, {
+                this.server.to(transactionInformation.currentReceiverId.toString()).emit('currentUserUpdated', [updatedReceiverData, {
                     friends: dataShake1Receiver, requests: dataShake2Receiver
                 }]);
 
@@ -95,6 +91,21 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             return { message: 'Data updated and sent to client' };
 
+        } catch (error) {
+            this.logger.error('Error updating and sending data', error);
+            throw error;
+        }
+    }
+
+    async WorkspacesUpdateManagement(transactionInformation: ISocialTransactionData) {
+        try {
+            const updatedWorkspaces = await this.workspacesService.FindAllWorkSpaces(transactionInformation.currentReceiverId);
+
+            if (updatedWorkspaces) {
+                this.server.to(transactionInformation.currentReceiverId.toString()).emit('userWorkspacesUpdated', updatedWorkspaces);
+            }
+
+            return { message: 'Data updated and sent to client' };
         } catch (error) {
             this.logger.error('Error updating and sending data', error);
             throw error;
