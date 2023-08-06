@@ -12,6 +12,12 @@ export interface ISpreadSheetPreferences {
     freezedColumns: number;
 }
 
+export interface ICollaborators {
+    _id?: string;
+    name: string;
+    role: string;
+}
+
 export class WorkSpaceDTO {
     name: string;
     prefix?: string;
@@ -21,5 +27,5 @@ export class WorkSpaceDTO {
     wspData?: ToDoDataDTO[];
     wspDataPreferences?: IAgilePreferences | ISpreadSheetPreferences;
     spreadSheetData?: SpreadDataDTO[];
-    sharedWith: ObjectId[];
+    collaborators: ICollaborators[];
 }

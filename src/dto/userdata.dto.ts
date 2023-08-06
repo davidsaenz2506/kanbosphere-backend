@@ -8,7 +8,7 @@ export interface IUserInvitations {
   workspaceUsersAmount: number;
   workspaceToJoin: string;
   requestDate: Date;
-  method: string;
+  method?: string;
 }
 
 export class UserDataDTO {

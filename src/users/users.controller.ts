@@ -51,7 +51,7 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Post('/handleInvitationToJob/:guestId')
   async AcceptJobInvitation(
-    @Param('guestId') guestId: string,
+    @Param('guestId') guestId: ObjectId,
     @Body() body: Partial<IUserInvitations>,
   ) {
     await this.service.HandleJobInvitation(body, guestId);

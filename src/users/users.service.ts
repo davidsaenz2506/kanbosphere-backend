@@ -32,14 +32,14 @@ export class UsersService {
     @InjectModel(UserLog.name) private usersLogModel: Model<UserLogDocument>,
     @InjectModel(WorkSpace.name)
     private workspaceModel: Model<WorkSpaceDocument>,
-  ) { }
+  ) {}
 
   async FindOneAndProceed(username: string): Promise<IUser | undefined> {
     return this.usersLogModel.findOne({ username });
   }
 
-  async FindByUserId(userId: string): Promise<IUser | undefined> {
-    return this.usersLogModel.findOne({ userId: userId });
+  async FindByUserId(userId: ObjectId): Promise<IUser | undefined> {
+    return this.usersLogModel.findOne({ _id: userId });
   }
 
   async FindOneAndUpdate(
@@ -72,8 +72,9 @@ export class UsersService {
 
   async HandleJobInvitation(
     hostInfo: Partial<IUserInvitations>,
-    guestId: string,
+    guestId: ObjectId,
   ): Promise<any> {
+    console.log(hostInfo);
     switch (hostInfo.method) {
       case 'delete':
         return this.usersLogModel.findOneAndUpdate(
@@ -91,6 +92,7 @@ export class UsersService {
         );
 
       case 'accept':
+        console.log('Aceptando!');
         await this.usersLogModel.findOneAndUpdate(
           { _id: guestId },
           {
@@ -109,10 +111,14 @@ export class UsersService {
           { _id: hostInfo.workspaceToJoinId },
           {
             $push: {
-              sharedWith: guestId
-            }
-          }
-        )
+              collaborators: {
+                _id: guestId,
+                name: (await this.FindByUserId(guestId)).username,
+                role: 'GUEST',
+              },
+            },
+          },
+        );
     }
   }
 
@@ -201,8 +207,15 @@ export class UsersService {
         ],
       },
       {
-        password: 0, friends: 0, requests: 0, 'invitations.hostId': 0, 'invitations.hostName': 0, 'invitations.workspaceToJoinType': 0,
-        'invitations.workspaceUsersAmount': 0, 'invitations.workspaceToJoin': 0, 'invitations.requestDate': 0,
+        password: 0,
+        friends: 0,
+        requests: 0,
+        'invitations.hostId': 0,
+        'invitations.hostName': 0,
+        'invitations.workspaceToJoinType': 0,
+        'invitations.workspaceUsersAmount': 0,
+        'invitations.workspaceToJoin': 0,
+        'invitations.requestDate': 0,
       },
     );
 
@@ -229,96 +242,151 @@ export class UsersService {
   }
 
   async SendFriendRequest(_id: string, canonicalId: ObjectId): Promise<any> {
-    const sendUserRequest = await this.usersLogModel.updateOne(
-      { _id },
-      {
-        $push: {
-          requests: {
-            canonicalId: canonicalId,
-            requestDate: new Date(),
+    const session = await this.usersLogModel.startSession();
+
+    try {
+      session.startTransaction();
+      const sendUserRequest = await this.usersLogModel.updateOne(
+        { _id },
+        {
+          $push: {
+            requests: {
+              canonicalId: canonicalId,
+              requestDate: new Date(),
+            },
           },
         },
-      },
-    );
+        { session },
+      );
 
-    return sendUserRequest;
+      await session.commitTransaction();
+      session.endSession();
+
+      return sendUserRequest;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 
   async AcceptFriendRequest(_id: string, canonicalId: ObjectId): Promise<any> {
-    await this.usersLogModel.updateOne(
-      { _id },
-      {
-        $pull: {
-          requests: {
-            canonicalId: canonicalId,
+    const session = await this.usersLogModel.startSession();
+
+    try {
+      session.startTransaction();
+      await this.usersLogModel.updateOne(
+        { _id },
+        {
+          $pull: {
+            requests: {
+              canonicalId: canonicalId,
+            },
           },
         },
-      },
-    );
+        { session },
+      );
 
-    await this.usersLogModel.updateOne(
-      { _id: canonicalId },
-      {
-        $push: {
-          friends: {
-            canonicalId: _id,
+      await this.usersLogModel.updateOne(
+        { _id: canonicalId },
+        {
+          $push: {
+            friends: {
+              canonicalId: _id,
+            },
           },
         },
-      },
-    );
+        { session },
+      );
 
-    const updateRequest = await this.usersLogModel.updateOne(
-      { _id },
-      {
-        $push: {
-          friends: {
-            canonicalId: canonicalId,
+      const updateRequest = await this.usersLogModel.updateOne(
+        { _id },
+        {
+          $push: {
+            friends: {
+              canonicalId: canonicalId,
+            },
           },
         },
-      },
-    );
+        { session },
+      );
 
-    return updateRequest;
+      await session.commitTransaction();
+      session.endSession();
+
+      return updateRequest;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 
   async DeleteFriendRequest(_id: string, canonicalId: ObjectId): Promise<any> {
-    const deleteRequest = await this.usersLogModel.updateOne(
-      { _id },
-      {
-        $pull: {
-          requests: {
-            canonicalId: canonicalId,
+    const session = await this.usersLogModel.startSession();
+
+    try {
+      session.startTransaction();
+      const deleteRequest = await this.usersLogModel.updateOne(
+        { _id },
+        {
+          $pull: {
+            requests: {
+              canonicalId: canonicalId,
+            },
           },
         },
-      },
-    );
+        { session },
+      );
 
-    return deleteRequest;
+      await session.commitTransaction();
+      session.endSession();
+
+      return deleteRequest;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 
   async DeleteFriend(_id: string, canonicalId: ObjectId): Promise<any> {
-    await this.usersLogModel.updateOne(
-      { _id: canonicalId },
-      {
-        $pull: {
-          friends: {
-            canonicalId: _id,
+    const session = await this.usersLogModel.startSession();
+
+    try {
+      session.startTransaction();
+      await this.usersLogModel.updateOne(
+        { _id: canonicalId },
+        {
+          $pull: {
+            friends: {
+              canonicalId: _id,
+            },
           },
         },
-      },
-    );
+        { session },
+      );
 
-    const deleteRequest = await this.usersLogModel.updateOne(
-      { _id },
-      {
-        $pull: {
-          friends: {
-            canonicalId: canonicalId,
+      const deleteRequest = await this.usersLogModel.updateOne(
+        { _id },
+        {
+          $pull: {
+            friends: {
+              canonicalId: canonicalId,
+            },
           },
         },
-      },
-    );
+        { session },
+      );
 
-    return deleteRequest;
+      await session.commitTransaction();
+      session.endSession();
+
+      return deleteRequest;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
 }

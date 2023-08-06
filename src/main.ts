@@ -3,6 +3,8 @@ import { AppModule } from './app/app.module';
 import { urlencoded, json } from 'express';
 import { Server } from 'socket.io';
 import { createServer } from 'http';
+import { SocketIdService } from './sockets/socketid.service';
+import { SocketGateway } from './datasocket/socket.gateway';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,8 +20,12 @@ async function bootstrap() {
   const httpServer = createServer(app.getHttpServer());
 
   const io = new Server(httpServer, { cors: { origin: '*' } });
+  const socketProvider = app.get(SocketIdService);
 
   io.on('connection', (request) => {
+  
+    socketProvider.setSocketId(request.id);
+
     request.on('joinToRoom', (dataSet) => {
       request.join(dataSet);
     });
@@ -33,7 +39,7 @@ async function bootstrap() {
     console.log(`Socket.IO server listening on port ${socketPort}`);
   });
 
-  app.get('SOCKET_SERVER').instance = io;
+  app.get(SocketGateway).setSockerServer(io)
 }
 
 bootstrap();

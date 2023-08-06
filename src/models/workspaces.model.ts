@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Document, ObjectId } from "mongoose";
 import { IFilePath, IPriority } from "src/dto/todoobject.dto";
-import { IAgilePreferences, ISpreadSheetPreferences } from "src/dto/workspaces.dto";
+import { IAgilePreferences, ICollaborators, ISpreadSheetPreferences } from "src/dto/workspaces.dto";
 
 export type WorkSpaceDocument = WorkSpace & Document;
 
@@ -51,7 +51,7 @@ export class WorkSpace {
     spreadSheetData: ISpreadData;
 
     @Prop({ required: false })
-    sharedWith: string[];
+    collaborators: ICollaborators[];
 
 }
 

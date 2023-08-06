@@ -5,7 +5,8 @@ import { AuthModule } from "src/auth/auth.module"
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { SpreadSheetModule } from 'src/spreadsheet/spreadsheet.module';
 import { UsersModule } from 'src/users/users.module';
-import { SocketModule } from 'src/datasocket/dataserver.module';
+import { SocketModule } from 'src/datasocket/socket.module';
+import { SocialModule } from 'src/social/social.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { SocketModule } from 'src/datasocket/dataserver.module';
     AuthModule,
     SpreadSheetModule,
     UsersModule,
-    SocketModule
+    SocketModule,
+    SocialModule
   ],
 })
 export class AppModule { }
