@@ -34,7 +34,7 @@ export class WorkspacesService {
       workspaceIdServer,
       {
         $push: {
-          sharedWith: userToAdd,
+          collaborators: userToAdd,
         },
       },
     );
