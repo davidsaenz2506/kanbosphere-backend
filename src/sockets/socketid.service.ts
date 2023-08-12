@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class SocketIdService {
-  private socketId: string = '';
+  private socketClient: Socket;
 
-  setSocketId(id: string) {
-    this.socketId = id;
+  setSocket(client: Socket) {
+    this.socketClient = client;
   }
 
-  getSocketId(): string {
-    return this.socketId;
+  getClient(): Socket {
+    return this.socketClient;
   }
 }

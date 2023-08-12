@@ -23,8 +23,8 @@ async function bootstrap() {
   const socketProvider = app.get(SocketIdService);
 
   io.on('connection', (request) => {
-  
-    socketProvider.setSocketId(request.id);
+
+    socketProvider.setSocket(request);
 
     request.on('joinToRoom', (dataSet) => {
       request.join(dataSet);

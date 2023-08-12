@@ -15,7 +15,7 @@ export class WorkspacesService {
   FindAllWorkSpaces(userId: ObjectId | string) {
     return this.workspaceModel.find({
       'collaborators._id': userId,
-    });
+    }, { container: 0 });
   }
 
   FindOne(userId: string) {
@@ -47,13 +47,14 @@ export class WorkspacesService {
     body: Partial<ToDoDataDTO>,
     method: string,
   ) {
+    console.log(body)
     switch (method) {
       case 'add':
         return this.workspaceModel.updateOne(
           { _id: id },
           {
             $push: {
-              wspData: body,
+              "container.wspData": body,
             },
           },
         );
@@ -62,7 +63,7 @@ export class WorkspacesService {
           { _id: id },
           {
             $pull: {
-              wspData: {
+              "container.wspData": {
                 taskId: body.taskId,
               },
             },
@@ -73,7 +74,7 @@ export class WorkspacesService {
           { _id: id },
           {
             $pull: {
-              wspData: {
+              "container.wspData": {
                 taskId: body.taskId,
               },
             },
@@ -84,7 +85,7 @@ export class WorkspacesService {
           { _id: id },
           {
             $push: {
-              wspData: body,
+              "container.wspData": body,
             },
           },
         );

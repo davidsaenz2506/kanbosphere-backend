@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Inject } from '@nestjs/common';
-import { Body, Post, UseGuards } from '@nestjs/common/decorators';
+import { Body, Post, Query, UseGuards } from '@nestjs/common/decorators';
 import { WorkSpaceDTO } from 'src/dto/workspaces.dto';
 import { WorkspacesService } from './workspaces.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -23,7 +23,8 @@ export class WorkspacesController {
 
   @UseGuards(AuthGuard)
   @Get('/:workspaceId')
-  async FindOneWorkSpace(@Param('workspaceId') workspaceId: string) {
+  async FindOneWorkSpace(@Param('workspaceId') workspaceId: string, @Query('socketId') socketId: string, @Query('userId') userId: string) {
+    await this.socketGateway.LeaveAllWorkspacesRoom(socketId, userId);
     return this.service.FindOne(workspaceId);
   }
 

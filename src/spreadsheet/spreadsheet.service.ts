@@ -15,8 +15,7 @@ export class SpreadSheetService {
         const currentServerData = await this.workspaceModel.findOne({
             _id: body.workspaceID,
         });
-        const filterServerData = currentServerData?.spreadSheetData?.data;
-
+        const filterServerData = currentServerData?.container?.spreadSheetData?.data;
 
         const filteredDataByQuery = filterServerData?.filter((currentRow) => {
             if (

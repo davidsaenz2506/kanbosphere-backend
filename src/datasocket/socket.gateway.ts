@@ -1,5 +1,5 @@
 import {
-    Logger,
+    Logger, NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -7,7 +7,7 @@ import { Model, ObjectId } from 'mongoose';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io-client';
 import { UserLog, UserLogDocument } from 'src/models/userlog.model';
-import { WorkSpace } from 'src/models/workspaces.model';
+import { SocketIdService } from 'src/sockets/socketid.service';
 import { UsersService } from 'src/users/users.service';
 import { WorkspacesService } from 'src/workspaces/workspaces.service';
 
@@ -32,6 +32,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         private readonly workspacesService: WorkspacesService,
         private readonly usersService: UsersService,
+        private readonly socketClient: SocketIdService,
         @InjectModel(UserLog.name) private usersSpaceModel: Model<UserLogDocument>,
     ) { }
 
@@ -45,6 +46,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     setSockerServer(sockerServer: Server) {
         this.server = sockerServer;
+    }
+
+    async LeaveAllWorkspacesRoom(currentSocketId: string, userId: string) {
+        const currentSocket = this.server.sockets.sockets.get(currentSocketId);
+
+        if (currentSocket?.rooms) {
+            Array.from(currentSocket?.rooms).forEach((currentSocketBlock) => {
+               if (currentSocketBlock !== userId) currentSocket.leave(currentSocketBlock)
+            })
+        }       
     }
 
     async RoomUpdateManagement(transactionInformation: ITransactionData) {
