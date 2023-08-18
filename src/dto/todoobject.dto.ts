@@ -20,6 +20,7 @@ export class ToDoDataDTO {
     userId: string;
     taskId: string;
     status: string;
+    type: string;
     priority: IPriority;
     description: string;
     info: string;

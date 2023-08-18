@@ -3,11 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { Model, ObjectId } from 'mongoose';
 import { IUserInvitations, UserDataDTO } from 'src/dto/userdata.dto';
-import {
-  IFriendRequest,
-  UserLog,
-  UserLogDocument,
-} from 'src/models/userlog.model';
+import { IFriendRequest, UserLog, UserLogDocument } from 'src/models/userlog.model';
 
 import * as jwt from 'jsonwebtoken';
 import * as sharp from 'sharp';
@@ -32,7 +28,7 @@ export class UsersService {
     @InjectModel(UserLog.name) private usersLogModel: Model<UserLogDocument>,
     @InjectModel(WorkSpace.name)
     private workspaceModel: Model<WorkSpaceDocument>,
-  ) {}
+  ) { }
 
   async FindOneAndProceed(username: string): Promise<IUser | undefined> {
     return this.usersLogModel.findOne({ username });
@@ -74,7 +70,6 @@ export class UsersService {
     hostInfo: Partial<IUserInvitations>,
     guestId: ObjectId,
   ): Promise<any> {
-    console.log(hostInfo);
     switch (hostInfo.method) {
       case 'delete':
         return this.usersLogModel.findOneAndUpdate(
@@ -123,21 +118,11 @@ export class UsersService {
   }
 
   async FindUserQuery(username: string, request: Request): Promise<any> {
-    const jsonWebTokenData: string =
-      request.headers.authorization.split(' ')[1];
+    const jsonWebTokenData: string = request.headers.authorization.split(' ')[1];
     const userSessionData: any = decodeJwtToken(jsonWebTokenData);
-    const currentUserFriendsAndRequest = await this.usersLogModel
-      .findOne({ username: userSessionData.username })
-      .select({ friends: 1, requests: 1, _id: 1 });
-
-    const currentUserFriends: string[] =
-      currentUserFriendsAndRequest.friends.map(
-        (currentFriend) => currentFriend.canonicalId,
-      );
-    const currentUserRequests: string[] =
-      currentUserFriendsAndRequest.requests.map(
-        (currentFriend) => currentFriend.canonicalId,
-      );
+    const currentUserFriendsAndRequest = await this.usersLogModel.findOne({ username: userSessionData.username }).select({ friends: 1, requests: 1, _id: 1 });
+    const currentUserFriends: string[] = currentUserFriendsAndRequest.friends.map((currentFriend) => currentFriend.canonicalId);
+    const currentUserRequests: string[] = currentUserFriendsAndRequest.requests.map((currentFriend) => currentFriend.canonicalId);
     const userDataCompressed: any = [];
 
     function decodeJwtToken(token: string): any {

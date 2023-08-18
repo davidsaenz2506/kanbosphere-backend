@@ -19,6 +19,9 @@ export class WorkSpace {
     @Prop({ required: true })
     type: string;
 
+    @Prop({ required: false })
+    isGoalsModeActive: boolean;
+
     @Prop({ required: true })
     collaborators: ICollaborators[];
 

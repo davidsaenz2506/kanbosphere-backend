@@ -6,7 +6,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Server } from 'socket.io';
 import { ObjectId } from 'mongoose';
 import { SocketGateway } from 'src/datasocket/socket.gateway';
-import { TransactionCardDTO, TransactionDTO } from 'src/dto/transaction.dto';
+import { TransactionCardDTO, TransactionDTO, TransactionSprintDTO } from 'src/dto/transaction.dto';
 
 @Controller('workspaces')
 export class WorkspacesController {
@@ -42,6 +42,30 @@ export class WorkspacesController {
     @Body() body: TransactionDTO,
   ) {
     await this.service.UpdateWorkspace(id, body.body);
+    await this.socketGateway.RoomUpdateManagement(body.transactionObject);
+    return
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/addSprint/:workspaceId')
+  async AddSprint(@Param('workspaceId') id: string, @Body() body: TransactionSprintDTO) {
+    await this.service.UpdateSprintData(id, body.body, "add");
+    await this.socketGateway.RoomUpdateManagement(body.transactionObject);
+    return
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/updateSprint/:workspaceId')
+  async UpdateSprint(@Param('workspaceId') id: string, @Body() body: TransactionSprintDTO) {
+    await this.service.UpdateSprintData(id, body.body, "update");
+    await this.socketGateway.RoomUpdateManagement(body.transactionObject);
+    return
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/deleteSprint/:workspaceId')
+  async DeleteSprint(@Param('workspaceId') id: string, @Body() body: TransactionSprintDTO) {
+    await this.service.UpdateSprintData(id, body.body, "delete");
     await this.socketGateway.RoomUpdateManagement(body.transactionObject);
     return
   }

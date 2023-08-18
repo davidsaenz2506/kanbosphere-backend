@@ -7,6 +7,7 @@ export interface IAgilePreferences {
 }
 
 export interface ISpreadSheetPreferences {
+    isAutoSaveOpen: boolean;
     isDarkModeOpen: boolean;
     isMultipleSelectionOpen: boolean;
     freezedColumns: number;
@@ -16,10 +17,21 @@ export interface ICollaborators {
     _id?: string;
     name: string;
     role: string;
+    containerPreferences: IAgilePreferences | ISpreadSheetPreferences;
+}
+
+export interface ISprintsData {
+    sprintId: string;
+    sprintPurpose: string;
+    sprintDescription: string;
+    isSprintActive: boolean;
+    sprintStartDate: string | null;
+    sprintEndDate: string | null;
+    linkedStories: string[];
 }
 
 export class ContainerDTO {
-    containerPreferences: IAgilePreferences | ISpreadSheetPreferences;
+    sprints?: ISprintsData[];
     wspData?: ToDoDataDTO[];
     spreadSheetData?: SpreadDataDTO;
 }
@@ -29,6 +41,7 @@ export class WorkSpaceDTO {
     createdDate: Date;
     createdById: string;
     type: string;
+    isGoalsModeActive: boolean;
     container: ContainerDTO;
     collaborators: ICollaborators[];
 }

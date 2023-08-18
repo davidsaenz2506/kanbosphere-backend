@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { ToDoDataDTO } from 'src/dto/todoobject.dto';
-import { WorkSpaceDTO } from 'src/dto/workspaces.dto';
+import { ISprintsData, WorkSpaceDTO } from 'src/dto/workspaces.dto';
 import { WorkSpace, WorkSpaceDocument } from 'src/models/workspaces.model';
 
 @Injectable()
@@ -86,6 +86,55 @@ export class WorkspacesService {
           {
             $push: {
               "container.wspData": body,
+            },
+          },
+        );
+    }
+  }
+
+  async UpdateSprintData(
+    id: string,
+    body: Partial<ISprintsData>,
+    method: string,
+  ) {
+    switch (method) {
+      case 'add':
+        return this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $push: {
+              "container.sprints": body,
+            },
+          },
+        );
+      case 'delete':
+        return this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $pull: {
+              "container.sprints": {
+                sprintId: body.sprintId,
+              },
+            },
+          },
+        );
+      case 'update':
+        await this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $pull: {
+              "container.sprints": {
+                 sprintId: body.sprintId,
+              },
+            },
+          },
+        );
+
+        await this.workspaceModel.updateOne(
+          { _id: id },
+          {
+            $push: {
+              "container.sprints": body,
             },
           },
         );

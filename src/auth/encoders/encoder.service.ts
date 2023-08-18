@@ -13,7 +13,6 @@ export class EncoderService {
         incomingPassword: string,
         encodePassword: string,
     ): Promise<Boolean> {
-
         return await bcrypt.compare(
             incomingPassword,
             await this.encodeDataBasePassword(encodePassword),

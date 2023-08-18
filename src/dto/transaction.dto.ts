@@ -1,5 +1,5 @@
 import { ITransactionData } from "src/datasocket/socket.gateway";
-import { WorkSpaceDTO } from "./workspaces.dto";
+import { ISprintsData, WorkSpaceDTO } from "./workspaces.dto";
 import { ToDoDataDTO } from "./todoobject.dto";
 
 export class TransactionDTO {
@@ -9,5 +9,10 @@ export class TransactionDTO {
 
 export class TransactionCardDTO {
     body: Partial<ToDoDataDTO>;
+    transactionObject: ITransactionData
+}
+
+export class TransactionSprintDTO {
+    body: Partial<ISprintsData>;
     transactionObject: ITransactionData
 }
