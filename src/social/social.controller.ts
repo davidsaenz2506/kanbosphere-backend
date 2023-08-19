@@ -41,6 +41,7 @@ export class SocialController {
     return { message: "Updated" }
   }
 
+  @UseGuards(AuthGuard)
   @Post('/contactOperations/:userId')
   async AcceptFriendRequest(
     @Param('userId') username: string,

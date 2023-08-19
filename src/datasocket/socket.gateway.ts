@@ -32,7 +32,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     constructor(
         private readonly workspacesService: WorkspacesService,
         private readonly usersService: UsersService,
-        private readonly socketClient: SocketIdService,
         @InjectModel(UserLog.name) private usersSpaceModel: Model<UserLogDocument>,
     ) { }
 

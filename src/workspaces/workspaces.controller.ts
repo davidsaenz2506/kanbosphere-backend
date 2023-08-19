@@ -3,7 +3,6 @@ import { Body, Post, Query, UseGuards } from '@nestjs/common/decorators';
 import { WorkSpaceDTO } from 'src/dto/workspaces.dto';
 import { WorkspacesService } from './workspaces.service';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { Server } from 'socket.io';
 import { ObjectId } from 'mongoose';
 import { SocketGateway } from 'src/datasocket/socket.gateway';
 import { TransactionCardDTO, TransactionDTO, TransactionSprintDTO } from 'src/dto/transaction.dto';
