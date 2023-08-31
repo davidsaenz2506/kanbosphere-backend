@@ -1,5 +1,5 @@
 import {
-    Logger, NotFoundException,
+    Logger 
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -7,7 +7,6 @@ import { Model, ObjectId } from 'mongoose';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io-client';
 import { UserLog, UserLogDocument } from 'src/models/userlog.model';
-import { SocketIdService } from 'src/sockets/socketid.service';
 import { UsersService } from 'src/users/users.service';
 import { WorkspacesService } from 'src/workspaces/workspaces.service';
 
